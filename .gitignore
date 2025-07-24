@@ -1,5 +1,58 @@
-# Ignore Gradle project-specific cache directory
-.gradle
+# ================================
+# Gradle
+# ================================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar  # <-- оставить wrapper
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
 
-# Ignore Gradle build output directory
-build
+# ================================
+# Java
+# ================================
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.ear
+
+# ================================
+# IDEs and tools
+# ================================
+# IntelliJ
+.idea/
+*.iml
+*.iws
+out/
+
+# VS Code
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ================================
+# OS and misc
+# ================================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ================================
+# Test reports and temporary files
+# ================================
+test-results/
+test-report/
