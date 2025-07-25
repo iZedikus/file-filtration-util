@@ -1,11 +1,9 @@
 package ru.izedikus.filefilter;
 
-public class CLI {
-  public String getGreeting() {
-    return "Hello CLI!";
-  }
+import ru.izedikus.filefilter.models.Arguments;
 
+public class CLI {
   public static void main(String[] args) {
-    System.out.println(new CLI().getGreeting());
+    Arguments parsedArgs = InputController.parse(args);
   }
 }

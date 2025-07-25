@@ -34,10 +34,23 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "ru.izedikus.filefilter.CLI"
+    mainClass = "ru.izedikus.filefilter.App"
 }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "ru.izedikus.filefilter.App"
+    }
 }
