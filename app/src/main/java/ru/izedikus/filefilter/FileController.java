@@ -6,15 +6,21 @@ import ru.izedikus.filefilter.models.Statistics;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
 public class FileController {
     public static Statistics generateStatisticsAndOutputFiles(Arguments args) {
-        try (LazyFileWriter intsWriter = new LazyFileWriter("ints.txt", args.addFlag());
-             LazyFileWriter floatsWriter = new LazyFileWriter("floats.txt", args.addFlag());
-             LazyFileWriter stringsWriter = new LazyFileWriter("strings.txt", args.addFlag())) {
+        String outputPath = args.outputPathIfBeenFlagged();
+        String prefix = args.prefixIfBeenFlagged();
+        boolean append = args.addFlag();
+
+        try (LazyFileWriter intsWriter = new LazyFileWriter(Paths.get(outputPath + prefix + "ints.txt"), append);
+             LazyFileWriter floatsWriter = new LazyFileWriter(Paths.get(outputPath + prefix + "floats.txt"), append);
+             LazyFileWriter stringsWriter = new LazyFileWriter(Paths.get(outputPath + prefix + "strings.txt"), append)) {
 
             TokenHandler processor = new TokenProcessor();
 
@@ -40,6 +46,7 @@ public class FileController {
                 handleScanner(scanner, intsWriter, floatsWriter, stringsWriter, processor);
             } catch (FileNotFoundException e) {
                 System.out.println("Возникли трудности с обработкой файла " + path);
+                // FIXME: Заменить на команду принтера
             }
         }
     }
@@ -70,25 +77,27 @@ public class FileController {
                 }
             } catch (IOException e) {
                 System.out.println("Ошибка при записи в выходные файлы:" + e.getMessage());
+                // FIXME: Заменить на команду принтера
                 return;
             }
         }
     }
 
     static class LazyFileWriter extends Writer {
-        private BufferedWriter realWriter;
-        private final String fileName;
-        private final boolean append;
+        BufferedWriter realWriter;
+        final Path filePath;
+        final boolean append;
 
-        public LazyFileWriter(String fileName, boolean append) {
-            this.fileName = fileName;
+        public LazyFileWriter(Path filePath, boolean append) {
+            this.filePath = filePath;
             this.append = append;
         }
 
         private void init() throws IOException {
             if (realWriter == null) {
+                Files.createDirectories(filePath.getParent());
                 realWriter = new BufferedWriter(
-                        new FileWriter(fileName, append),
+                        new FileWriter(filePath.toString(), append),
                         8192
                 );
             }
