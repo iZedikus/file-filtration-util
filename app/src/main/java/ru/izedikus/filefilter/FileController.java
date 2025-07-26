@@ -11,105 +11,68 @@ import java.util.List;
 import java.util.Scanner;
 
 public class FileController {
-    public static Statistics generateStatisticsAndOutputFiles(Arguments args) throws IOException {
-        Long countInt = 0L;
-        Long countFloat = 0L;
-        Long countString = 0L;
+    public static Statistics generateStatisticsAndOutputFiles(Arguments args) {
+        try (LazyFileWriter intsWriter = new LazyFileWriter("ints.txt", args.addFlag());
+             LazyFileWriter floatsWriter = new LazyFileWriter("floats.txt", args.addFlag());
+             LazyFileWriter stringsWriter = new LazyFileWriter("strings.txt", args.addFlag())) {
 
-        BigInteger sumInt = new BigInteger("0");
-        BigInteger minInt = new BigInteger("0");
-        BigInteger maxInt = new BigInteger("0");
-        BigDecimal avgInt = new BigDecimal("0.0");
+            TokenHandler processor = new TokenProcessor();
 
-        BigDecimal sumFloat = new BigDecimal("0.0");
-        BigDecimal minFloat = new BigDecimal("0.0");
-        BigDecimal maxFloat = new BigDecimal("0.0");
-        BigDecimal avgFloat = new BigDecimal("0.0");
+            handleData(args, intsWriter, floatsWriter, stringsWriter, processor);
 
-        int minStringLen = Integer.MAX_VALUE;
-        int maxStringLen = 0;
+            return processor.getStatistics();
 
-        boolean isAppend = args.addFlag();
-        LazyFileWriter intsFileWriter = new LazyFileWriter("ints.txt", isAppend);
-        LazyFileWriter floatsFileWriter = new LazyFileWriter("floats.txt", isAppend);
-        LazyFileWriter stringsFileWriter = new LazyFileWriter("strings.txt", isAppend);
-
-        List<Scanner> scanners = getInputFileScanners(args.inputFiles());
-
-        for (Scanner scanner : scanners) {
-            if (scanner.hasNextBigInteger()) {
-                BigInteger curInt = scanner.nextBigInteger();
-                countInt++;
-
-                sumInt = sumInt.add(curInt);
-                if (curInt.compareTo(minInt) < 0) {
-                    minInt = curInt;
-                } else if (curInt.compareTo(maxInt) > 0) {
-                    maxInt = curInt;
-                }
-
-                String integerStr = curInt.toString();
-                intsFileWriter.write(integerStr, 0, integerStr.length());
-
-            } else if (scanner.hasNextBigDecimal()) {
-                BigDecimal curFloat = scanner.nextBigDecimal();
-                countFloat++;
-
-                sumFloat = sumFloat.add(curFloat);
-                if (curFloat.compareTo(minFloat) < 0) {
-                    minFloat = curFloat;
-                } else if (curFloat.compareTo(maxFloat) > 0) {
-                    maxFloat = curFloat;
-                }
-
-                String floatStr = curFloat.toString();
-                floatsFileWriter.write(floatStr, 0, floatStr.length());
-
-            } else {
-                String curString = scanner.next();
-                countString++;
-
-                if (curString.length() > maxStringLen) {
-                    maxStringLen = curString.length();
-                } else if (curString.length() < minStringLen) {
-                    minStringLen = curString.length();
-                }
-
-                stringsFileWriter.write(curString, 0, curString.length());
-            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("Ошибка при создании файлов", e);
         }
-
-        return new Statistics(
-                countInt,
-                countFloat,
-                countString,
-                sumInt,
-                minInt,
-                maxInt,
-                avgInt,
-                sumFloat,
-                minFloat,
-                maxFloat,
-                avgFloat,
-                minStringLen,
-                maxStringLen
-        );
     }
 
-    static List<Scanner> getInputFileScanners(List<String> filePaths) {
-        List<Scanner> scanners = new ArrayList<>();
-        for (String filePath : filePaths) {
-            try {
-                scanners.add(new Scanner(new File(filePath)));
-            } catch (NullPointerException | FileNotFoundException e) {
-                // FIXME: Syserr файл не существует
+    static void handleData(
+            Arguments args,
+            LazyFileWriter intsWriter,
+            LazyFileWriter floatsWriter,
+            LazyFileWriter stringsWriter,
+            TokenHandler processor
+    ) {
+        List<String> filePaths = args.inputFiles();
+        for (String path : filePaths) {
+            try (Scanner scanner = new Scanner(new File(path))) {
+                handleScanner(scanner, intsWriter, floatsWriter, stringsWriter, processor);
+            } catch (FileNotFoundException e) {
+                System.out.println("Возникли трудности с обработкой файла " + path);
             }
         }
-        if (scanners.isEmpty()) {
-            // FIXME: Syserr пригодных к обработке файлов нет
-        }
+    }
 
-        return scanners;
+    static void handleScanner(
+            Scanner scanner,
+            LazyFileWriter intsWriter,
+            LazyFileWriter floatsWriter,
+            LazyFileWriter stringsWriter,
+            TokenHandler processor
+    ) {
+        while (scanner.hasNext()) {
+            try {
+                if (scanner.hasNextBigInteger()) {
+                    BigInteger value = scanner.nextBigInteger();
+                    processor.handleInteger(value);
+                    intsWriter.write(value + System.lineSeparator());
+
+                } else if (scanner.hasNextBigDecimal()) {
+                    BigDecimal value = scanner.nextBigDecimal();
+                    processor.handleFloat(value);
+                    floatsWriter.write(value + System.lineSeparator());
+
+                } else {
+                    String value = scanner.next();
+                    processor.handleString(value);
+                    stringsWriter.write(value + System.lineSeparator());
+                }
+            } catch (IOException e) {
+                System.out.println("Ошибка при записи в выходные файлы:" + e.getMessage());
+                return;
+            }
+        }
     }
 
     static class LazyFileWriter extends Writer {
