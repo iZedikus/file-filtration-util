@@ -47,8 +47,8 @@ public class FileController {
         );
     }
 
-    class LazyFileWriter extends Writer {
-        private FileWriter realWriter;
+    static class LazyFileWriter extends Writer {
+        private BufferedWriter realWriter;
         private final String fileName;
         private final boolean append;
 
@@ -59,7 +59,10 @@ public class FileController {
 
         private void init() throws IOException {
             if (realWriter == null) {
-                realWriter = new FileWriter(fileName, append);
+                realWriter = new BufferedWriter(
+                        new FileWriter(fileName, append),
+                        8192
+                );
             }
         }
 
