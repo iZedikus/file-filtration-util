@@ -18,15 +18,15 @@ public class FileController {
         BigInteger sumInt = new BigInteger("0");
         BigInteger minInt = new BigInteger("0");
         BigInteger maxInt = new BigInteger("0");
-        BigInteger avgInt = new BigInteger("0");
+        BigDecimal avgInt = new BigDecimal("0.0");
 
         BigDecimal sumFloat = new BigDecimal("0.0");
         BigDecimal minFloat = new BigDecimal("0.0");
         BigDecimal maxFloat = new BigDecimal("0.0");
         BigDecimal avgFloat = new BigDecimal("0.0");
 
-        Long minStringLen = 0L;
-        Long maxStringLen = 0L;
+        int minStringLen = Integer.MAX_VALUE;
+        int maxStringLen = 0;
 
 
 

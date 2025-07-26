@@ -11,13 +11,13 @@ public record Statistics(
   BigInteger sumInt,
   BigInteger minInt,
   BigInteger maxInt,
-  BigInteger avgInt,
+  BigDecimal avgInt,
 
   BigDecimal sumFloat,
   BigDecimal minFloat,
   BigDecimal maxFloat,
   BigDecimal avgFloat,
 
-  Long minStringLen,
-  Long maxStringLen
+  int minStringLen,
+  int maxStringLen
   ) {}
