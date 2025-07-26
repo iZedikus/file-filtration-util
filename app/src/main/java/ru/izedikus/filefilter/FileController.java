@@ -22,7 +22,9 @@ public class FileController {
              LazyFileWriter floatsWriter = new LazyFileWriter(Paths.get(outputPath + prefix + "floats.txt"), append);
              LazyFileWriter stringsWriter = new LazyFileWriter(Paths.get(outputPath + prefix + "strings.txt"), append)) {
 
-            TokenHandler processor = new TokenProcessor();
+            TokenHandler processor = args.fullStatsFlag()
+                    ? new TokenFullStatsProcessor()
+                    : new TokenShortStatsProcessor();
 
             handleData(args, intsWriter, floatsWriter, stringsWriter, processor);
 

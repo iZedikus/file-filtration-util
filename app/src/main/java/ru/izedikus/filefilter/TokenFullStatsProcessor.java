@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-public class TokenProcessor implements TokenHandler {
+public class TokenFullStatsProcessor implements TokenHandler {
     Long countInt = 0L;
     Long countFloat = 0L;
     Long countString = 0L;
