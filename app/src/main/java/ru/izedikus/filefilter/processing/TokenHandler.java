@@ -1,4 +1,4 @@
-package ru.izedikus.filefilter;
+package ru.izedikus.filefilter.processing;
 
 import ru.izedikus.filefilter.models.Statistics;
 

@@ -1,9 +1,11 @@
-package ru.izedikus.filefilter;
+package ru.izedikus.filefilter.input;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.izedikus.filefilter.models.Arguments;
+import ru.izedikus.filefilter.output.OutputController;
+import ru.izedikus.filefilter.output.OutputMessage;
 
 public class InputController {
     public static Arguments parse(String[] args) {

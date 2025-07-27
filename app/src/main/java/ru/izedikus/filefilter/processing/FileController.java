@@ -1,9 +1,11 @@
-package ru.izedikus.filefilter;
+package ru.izedikus.filefilter.processing;
 
 import ru.izedikus.filefilter.exceptions.IncorrectOutputPathException;
 import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
+import ru.izedikus.filefilter.output.OutputController;
+import ru.izedikus.filefilter.output.OutputMessage;
 
 import java.io.*;
 import java.math.BigDecimal;

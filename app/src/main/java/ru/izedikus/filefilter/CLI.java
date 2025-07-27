@@ -2,8 +2,12 @@ package ru.izedikus.filefilter;
 
 import ru.izedikus.filefilter.exceptions.IncorrectOutputPathException;
 import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
+import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
+import ru.izedikus.filefilter.output.OutputController;
+import ru.izedikus.filefilter.output.OutputMessage;
+import ru.izedikus.filefilter.processing.FileController;
 
 public class CLI {
     public static void main(String[] args) {

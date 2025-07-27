@@ -1,4 +1,4 @@
-package ru.izedikus.filefilter;
+package ru.izedikus.filefilter.output;
 
 import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.models.Statistics;

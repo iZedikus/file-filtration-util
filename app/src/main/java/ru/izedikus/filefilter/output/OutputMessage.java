@@ -1,4 +1,4 @@
-package ru.izedikus.filefilter;
+package ru.izedikus.filefilter.output;
 
 public enum OutputMessage {
     /// Parsing args
@@ -25,7 +25,8 @@ public enum OutputMessage {
     ZERO_INPUT_FILES_EXCEPTION("Пригодных к обработке файлов не обнаружено, программа завершает работу. Создайте и укажите не пустые .txt файлы для корректного запуска"),
     INCORRECT_OUTPUT_PATH_EXCEPTION("Невозможно создать выходной файл %s, программа завершает работу. Укажите допустимый путь в формате -o <path>"),
 
-    ///  Output
+
+    /// Output
     SUCCESS("Файлы успешно были обработаны!"),
 
     SHORT_STATS("КРАТКАЯ СТАТИСТИКА:"),
@@ -55,6 +56,8 @@ public enum OutputMessage {
             """),
 
     END("Программа завершает работу");
+
+
     private final String value;
 
     OutputMessage(String text) {
