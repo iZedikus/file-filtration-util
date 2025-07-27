@@ -1,5 +1,6 @@
 package ru.izedikus.filefilter;
 
+import ru.izedikus.filefilter.exceptions.IncorrectOutputPathException;
 import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
@@ -15,7 +16,9 @@ import java.util.Scanner;
 
 public class FileController {
     public static Statistics generateStatisticsAndOutputFiles(Arguments args) {
-        String outputPath = args.outputPathIfBeenFlagged();
+        String outputPath = args.outputPathIfBeenFlagged().isBlank()
+                ? Paths.get("").toAbsolutePath().toString()
+                : args.outputPathIfBeenFlagged();
         String prefix = args.prefixIfBeenFlagged();
         boolean append = args.addFlag();
 
@@ -81,7 +84,7 @@ public class FileController {
                     stringsWriter.write(value + System.lineSeparator());
                 }
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                throw new IncorrectOutputPathException(e.getMessage());
             }
         }
     }

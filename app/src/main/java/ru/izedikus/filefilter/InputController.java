@@ -81,7 +81,10 @@ public class InputController {
                 if (arg.contains("|\\*:?\"<>")) {
                     OutputController.printMessage(OutputMessage.INCORRECT_OUTPUT_PATH);
                 } else {
-                    outputPath = arg;
+                    outputPath = arg.replace('\\', '/');
+                    if (!outputPath.endsWith("/")) {
+                        outputPath = outputPath + "/";
+                    }
                 }
                 isOutput = false;
                 continue;

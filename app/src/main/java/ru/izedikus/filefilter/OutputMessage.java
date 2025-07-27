@@ -23,6 +23,7 @@ public enum OutputMessage {
     /// File reading
     INPUT_FILE_NOT_FOUND("Входной файл %s не найден"),
     ZERO_INPUT_FILES("Пригодных к обработке файлов не обнаружено, программа завершает работу"),
+    INCORRECT_OUTPUT_PATH_EXCEPTION("Невозможно создать выходной файл %s, программа завершает работу. Укажите допустимый путь в формате -o <path>"),
 
     ///  Output
     SUCCESS("Файлы успешно были обработаны!"),
