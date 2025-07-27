@@ -12,7 +12,7 @@ public class CLI {
             Statistics stats = FileController.generateStatisticsAndOutputFiles(parsedArgs);
             OutputController.printStatistics(stats, parsedArgs.fullStatsFlag());
         } catch (ZeroInputFilesException e) {
-            OutputController.printMessage(OutputMessage.ZERO_INPUT_FILES);
+            OutputController.printMessage(OutputMessage.ZERO_INPUT_FILES_EXCEPTION);
         } catch (IncorrectOutputPathException e) {
             OutputController.printMessage(OutputMessage.INCORRECT_OUTPUT_PATH_EXCEPTION, e.getMessage());
         }

@@ -22,7 +22,7 @@ public enum OutputMessage {
 
     /// File reading
     INPUT_FILE_NOT_FOUND("Входной файл %s не найден"),
-    ZERO_INPUT_FILES("Пригодных к обработке файлов не обнаружено, программа завершает работу"),
+    ZERO_INPUT_FILES_EXCEPTION("Пригодных к обработке файлов не обнаружено, программа завершает работу. Создайте и укажите не пустые .txt файлы для корректного запуска"),
     INCORRECT_OUTPUT_PATH_EXCEPTION("Невозможно создать выходной файл %s, программа завершает работу. Укажите допустимый путь в формате -o <path>"),
 
     ///  Output
@@ -54,7 +54,7 @@ public enum OutputMessage {
             Строка максимальной длины: %s
             """),
 
-    END("Программа завершила работу");
+    END("Программа завершает работу");
     private final String value;
 
     OutputMessage(String text) {

@@ -53,6 +53,7 @@ public class OutputController {
                     stats.maxStringLen()
             ));
         }
+        System.out.println(OutputMessage.END.getValue());
     }
 
     public static void printMessage(OutputMessage message) {
