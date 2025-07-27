@@ -1,5 +1,6 @@
 package ru.izedikus.filefilter;
 
+import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
 
@@ -31,7 +32,7 @@ public class FileController {
             return processor.getStatistics();
 
         } catch (IOException e) {
-            throw new UncheckedIOException("Ошибка при создании файлов", e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -43,12 +44,14 @@ public class FileController {
             TokenHandler processor
     ) {
         List<String> filePaths = args.inputFiles();
+        if (args.inputFiles().isEmpty()) {
+            throw new ZeroInputFilesException();
+        }
         for (String path : filePaths) {
             try (Scanner scanner = new Scanner(new File(path))) {
                 handleScanner(scanner, intsWriter, floatsWriter, stringsWriter, processor);
             } catch (FileNotFoundException e) {
-                System.out.println("Возникли трудности с обработкой файла " + path);
-                // FIXME: Заменить на команду принтера
+                OutputController.printMessage(OutputMessage.INPUT_FILE_NOT_FOUND, path);
             }
         }
     }
@@ -78,9 +81,7 @@ public class FileController {
                     stringsWriter.write(value + System.lineSeparator());
                 }
             } catch (IOException e) {
-                System.out.println("Ошибка при записи в выходные файлы:" + e.getMessage());
-                // FIXME: Заменить на команду принтера
-                return;
+                throw new UncheckedIOException(e);
             }
         }
     }

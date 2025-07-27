@@ -1,9 +1,13 @@
 package ru.izedikus.filefilter;
 
+import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.models.Statistics;
 
 public class OutputController {
     public static void printStatistics(Statistics stats, boolean full) {
+        if (stats.countInt() == 0 && stats.countFloat() == 0 && stats.countString() == 0) {
+            throw new ZeroInputFilesException();
+        }
         System.out.println(OutputMessage.SUCCESS.getValue());
         if (full) {
             printFullStatistics(stats);
