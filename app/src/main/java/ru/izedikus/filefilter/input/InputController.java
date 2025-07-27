@@ -80,7 +80,7 @@ public class InputController {
             }
 
             if (isOutput != null && isOutput) {
-                if (arg.contains("|\\*:?\"<>")) {
+                if (arg.matches(".*[|*:?\"<>].*")) {
                     OutputController.printMessage(OutputMessage.INCORRECT_OUTPUT_PATH);
                 } else {
                     outputPath = arg.replace('\\', '/');
@@ -93,7 +93,7 @@ public class InputController {
             }
 
             if (isPrefix != null && isPrefix) {
-                if (arg.contains("/|\\*:?\"<>")) {
+                if (arg.matches(".*[/|*:?\"<>].*")) {
                     OutputController.printMessage(OutputMessage.INCORRECT_PREFIX);
                 } else {
                     prefix = arg;
@@ -102,7 +102,7 @@ public class InputController {
                 continue;
             }
 
-            if (arg.contains("|\\*:?\"<>")) {
+            if (arg.matches(".*[|*:?\"<>].*")) {
                 OutputController.printMessage(OutputMessage.INCORRECT_TXT_FILE);
                 continue;
             }
