@@ -34,7 +34,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "ru.izedikus.filefilter.App"
+    mainClass = "ru.izedikus.filefilter.CLI"
 }
 
 tasks.named<Test>("test") {
@@ -51,6 +51,6 @@ tasks.named<Test>("test") {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "ru.izedikus.filefilter.App"
+        attributes["Main-Class"] = "ru.izedikus.filefilter.CLI"
     }
 }
