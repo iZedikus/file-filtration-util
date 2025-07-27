@@ -2,78 +2,250 @@ package ru.izedikus.filefilter;
 
 import org.junit.jupiter.api.Test;
 
+import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 class InputControllerTest {
 
-  @Test
-  void testParseInputFiles() {
-    String[] args = { "file1.txt", "file2.txt" };
-    Arguments parsedArgs = InputController.parse(args);
+    @Test
+    void noArguments() {
+        String[] args = new String[]{};
+        Arguments parsedArgs = InputController.parse(args);
 
-    assertEquals(List.of(args), parsedArgs.inputFiles());
-  }
+        assertEquals(List.of(), parsedArgs.inputFiles());
+        assertEquals("", parsedArgs.outputPathIfBeenFlagged());
+        assertEquals("", parsedArgs.prefixIfBeenFlagged());
+        assertFalse(parsedArgs.addFlag());
+        assertFalse(parsedArgs.fullStatsFlag());
+    }
 
-  @Test
-  void testParseAddFlag() {
-    String[] args1 = { "-a" };
-    String[] args2 = { "--add" };
+    @Test
+    void inputFiles_invalidFilenameChars() {
+        String[] args = new String[]{"fi*le1"};
+        Arguments parsedArgs = InputController.parse(args);
 
-    Arguments parsedArgs1 = InputController.parse(args1);
-    Arguments parsedArgs2 = InputController.parse(args2);
+        assertTrue(parsedArgs.inputFiles().isEmpty());
+    }
 
-    assertEquals(true, parsedArgs1.addFlag());
-    assertEquals(true, parsedArgs2.addFlag());
-  }
+    @Test
+    void inputFiles_withoutExtension() {
+        String[] args = new String[]{"file1"};
+        Arguments parsedArgs = InputController.parse(args);
 
-  @Test
-  void testParseFullFlag() {
-    String[] args1 = { "-f" };
-    String[] args2 = { "--full" };
+        assertEquals(List.of("file1.txt"), parsedArgs.inputFiles());
+    }
 
-    Arguments parsedArgs1 = InputController.parse(args1);
-    Arguments parsedArgs2 = InputController.parse(args2);
+    @Test
+    void addFlag_setCorrectly() {
+        String[] args1 = new String[]{"-a"};
+        String[] args2 = new String[]{"--add"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
 
-    assertEquals(true, parsedArgs1.fullStatsFlag());
-    assertEquals(true, parsedArgs2.fullStatsFlag());
-  }
+        assertTrue(parsedArgs1.addFlag());
+        assertTrue(parsedArgs2.addFlag());
+    }
 
-  @Test
-  void testParseOutputFlag() {
-    String[] args1 = { "-o", "/internalFolder" };
-    String[] args2 = { "--output", "/internalFolder" };
+    @Test
+    void addFlag_manyFlags() {
+        String[] args1 = new String[]{"-a", "-a"};
+        String[] args2 = new String[]{"--add", "--add"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
 
-    Arguments parsedArgs1 = InputController.parse(args1);
-    Arguments parsedArgs2 = InputController.parse(args2);
+        assertTrue(parsedArgs1.addFlag());
+        assertTrue(parsedArgs2.addFlag());
+    }
 
-    assertEquals("/internalFolder", parsedArgs1.outputPathIfBeenFlagged());
-    assertEquals("/internalFolder", parsedArgs2.outputPathIfBeenFlagged());
-  }
+    @Test
+    void fullFlag_setCorrectly() {
+        String[] args1 = new String[]{"-f"};
+        String[] args2 = new String[]{"--full"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
 
-  @Test
-  void testParsePrefixFlag() {
-    String[] args1 = { "-p", "prefix_" };
-    String[] args2 = { "--prefix", "prefix_" };
+        assertTrue(parsedArgs1.fullStatsFlag());
+        assertTrue(parsedArgs2.fullStatsFlag());
+    }
 
-    Arguments parsedArgs1 = InputController.parse(args1);
-    Arguments parsedArgs2 = InputController.parse(args2);
+    @Test
+    void fullFlag_manyFlags() {
+        String[] args1 = new String[]{"-f", "-f"};
+        String[] args2 = new String[]{"--full", "--full"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
 
-    assertEquals("prefix_", parsedArgs1.prefixIfBeenFlagged());
-    assertEquals("prefix_", parsedArgs2.prefixIfBeenFlagged());
-  }
+        assertTrue(parsedArgs1.fullStatsFlag());
+        assertTrue(parsedArgs2.fullStatsFlag());
+    }
 
-  @Test
-  void testParseAllFlagsAndFiles() {
-    String[] args = { "file1.txt", "-a", "-f", "--output", "/internalFolder", "-p", "prefix_", "file2.txt" };
+    @Test
+    void shortFlag_setCorrectly() {
+        String[] args1 = new String[]{"-s"};
+        String[] args2 = new String[]{"--short"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
 
-    Arguments parsedArgs = InputController.parse(args);
-    Arguments expectedArgs = new Arguments(List.of("file1.txt", "file2.txt"), "/internalFolder", "prefix_", true,
-        true);
+        assertFalse(parsedArgs1.fullStatsFlag());
+        assertFalse(parsedArgs2.fullStatsFlag());
+    }
 
-    assertEquals(expectedArgs, parsedArgs);
-  }
+    @Test
+    void shortFlag_manyFlags() {
+        String[] args1 = new String[]{"-s", "-s"};
+        String[] args2 = new String[]{"--short", "--short"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertFalse(parsedArgs1.fullStatsFlag());
+        assertFalse(parsedArgs2.fullStatsFlag());
+    }
+
+    @Test
+    void fullAndShortFlags_conflict() {
+        String[] args = new String[]{"-f", "-s"};
+        Arguments parsedArgs = InputController.parse(args);
+
+        assertTrue(parsedArgs.fullStatsFlag());
+    }
+
+    @Test
+    void shortAndFullFlags_conflict() {
+        String[] args = new String[]{"-s", "-f"};
+        Arguments parsedArgs = InputController.parse(args);
+
+        assertFalse(parsedArgs.fullStatsFlag());
+    }
+
+    @Test
+    void outputPath_formatCorrectly() {
+        String[] args1 = new String[]{"-o", "path/"};
+        String[] args2 = new String[]{"--output", "path/"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("path/", parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals("path/", parsedArgs2.outputPathIfBeenFlagged());
+    }
+
+    @Test
+    void outputPath_formatIncorrectly() {
+        String[] args1 = new String[]{"-o", "pa*th/"};
+        String[] args2 = new String[]{"--output", "pa*th/"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("", parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals("", parsedArgs2.outputPathIfBeenFlagged());
+    }
+
+    @Test
+    void outputPath_withoutEndingSlash() {
+        String[] args1 = new String[]{"-o", "path"};
+        String[] args2 = new String[]{"--output", "path"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("path/", parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals("path/", parsedArgs2.outputPathIfBeenFlagged());
+    }
+
+    @Test
+    void outputPath_missingArgument_skip() {
+        String[] args1 = new String[]{"file1", "-o"};
+        String[] args2 = new String[]{"file1", "--output"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals(List.of("file1.txt"), parsedArgs1.inputFiles());
+        assertEquals(List.of("file1.txt"), parsedArgs2.inputFiles());
+        assertEquals("", parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals("", parsedArgs2.outputPathIfBeenFlagged());
+    }
+
+    @Test
+    void outputFlag_manyFlags() {
+        String[] args1 = new String[]{"-o", "path1", "-o", "-path2"};
+        String[] args2 = new String[]{"--output", "path1", "--output", "path2"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("path1/", parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals("path1/", parsedArgs2.outputPathIfBeenFlagged());
+    }
+
+    @Test
+    void prefix_formatCorrectly() {
+        String[] args1 = new String[]{"-p", "prefix_"};
+        String[] args2 = new String[]{"--prefix", "prefix_"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("prefix_", parsedArgs1.prefixIfBeenFlagged());
+        assertEquals("prefix_", parsedArgs2.prefixIfBeenFlagged());
+    }
+
+    @Test
+    void prefix_formatIncorrectly() {
+        String[] args1 = new String[]{"-p", "pre*fix_"};
+        String[] args2 = new String[]{"--prefix", "pre*fix_"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("", parsedArgs1.prefixIfBeenFlagged());
+        assertEquals("", parsedArgs2.prefixIfBeenFlagged());
+    }
+
+    @Test
+    void prefix_missingArgument() {
+        String[] args1 = new String[]{"file1", "-p"};
+        String[] args2 = new String[]{"file1", "--prefix"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals(List.of("file1.txt"), parsedArgs1.inputFiles());
+        assertEquals(List.of("file1.txt"), parsedArgs2.inputFiles());
+        assertEquals("", parsedArgs1.prefixIfBeenFlagged());
+        assertEquals("", parsedArgs2.prefixIfBeenFlagged());
+    }
+
+    @Test
+    void prefix_manyFlags() {
+        String[] args1 = new String[]{"-p", "prefix1_", "-p", "prefix2_"};
+        String[] args2 = new String[]{"--prefix", "prefix1_", "--prefix", "prefix2_"};
+        Arguments parsedArgs1 = InputController.parse(args1);
+        Arguments parsedArgs2 = InputController.parse(args2);
+
+        assertEquals("prefix1_", parsedArgs1.prefixIfBeenFlagged());
+        assertEquals("prefix1_", parsedArgs2.prefixIfBeenFlagged());
+    }
+
+    @Test
+    void mixedFlagsAndFiles() {
+        String[] args = new String[]{"file1", "-a", "-o", "path", "file2", "-p", "prefix_", "-s"};
+        Arguments parsedArgs = InputController.parse(args);
+
+        assertEquals(List.of("file1.txt", "file2.txt"), parsedArgs.inputFiles());
+        assertTrue(parsedArgs.addFlag());
+        assertEquals("path/", parsedArgs.outputPathIfBeenFlagged());
+        assertEquals("prefix_", parsedArgs.prefixIfBeenFlagged());
+    }
+
+    @Test
+    void invalidFlag_skip() {
+        String[] args = new String[]{"-x", "file1"};
+        Arguments parsedArgs = InputController.parse(args);
+
+        assertEquals(List.of("file1.txt"), parsedArgs.inputFiles());
+    }
 }
