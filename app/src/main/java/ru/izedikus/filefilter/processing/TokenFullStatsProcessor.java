@@ -26,7 +26,7 @@ public class TokenFullStatsProcessor implements TokenHandler {
     public void handleInteger(BigInteger curInteger) {
         countInt++;
         sumInt = sumInt.add(curInteger);
-        minInt = (curInteger.compareTo(minInt) < 0) ? curInteger : minInt;
+        minInt = (minInt.equals(BigInteger.ZERO) || curInteger.compareTo(minInt) < 0) ? curInteger : minInt;
         maxInt = (curInteger.compareTo(maxInt) > 0) ? curInteger : maxInt;
     }
 
@@ -34,7 +34,7 @@ public class TokenFullStatsProcessor implements TokenHandler {
     public void handleFloat(BigDecimal curDecimal) {
         countFloat++;
         sumFloat = sumFloat.add(curDecimal);
-        minFloat = (curDecimal.compareTo(minFloat) < 0) ? curDecimal : minFloat;
+        minFloat = (minFloat.equals(BigDecimal.ZERO) || curDecimal.compareTo(minFloat) < 0) ? curDecimal : minFloat;
         maxFloat = (curDecimal.compareTo(maxFloat) > 0) ? curDecimal : maxFloat;
     }
 
