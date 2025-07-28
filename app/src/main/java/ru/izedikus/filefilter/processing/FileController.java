@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class FileController {
@@ -53,7 +54,7 @@ public class FileController {
             throw new ZeroInputFilesException();
         }
         for (String path : filePaths) {
-            try (Scanner scanner = new Scanner(new File(path))) {
+            try (Scanner scanner = new Scanner(new File(path)).useLocale(Locale.US)) {
                 handleScanner(scanner, intsWriter, floatsWriter, stringsWriter, processor);
             } catch (FileNotFoundException e) {
                 OutputController.printMessage(OutputMessage.INPUT_FILE_NOT_FOUND, path);
