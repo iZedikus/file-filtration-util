@@ -54,7 +54,7 @@ public class InputController {
                     case "-o", "--output":
                         if (isOutput != null) {
                             OutputController.printMessage(OutputMessage.MANY_OUTPUTS);
-                        } else if (i == args.length -1 || args[i+1].charAt(0) == '-') {
+                        } else if (i == args.length - 1 || args[i + 1].charAt(0) == '-') {
                             OutputController.printMessage(OutputMessage.MISSING_OUTPUT_PATH);
                         } else {
                             isOutput = true;
@@ -63,7 +63,7 @@ public class InputController {
                     case "-p", "--prefix":
                         if (isPrefix != null) {
                             OutputController.printMessage(OutputMessage.MANY_PREFIXES);
-                        } else if (i == args.length - 1 || args[i+1].charAt(0) == '-') {
+                        } else if (i == args.length - 1 || args[i + 1].charAt(0) == '-') {
                             OutputController.printMessage(OutputMessage.MISSING_PREFIX);
                         } else {
                             isPrefix = true;
@@ -77,7 +77,9 @@ public class InputController {
             }
 
             if (isOutput != null && isOutput) {
-                if (arg.matches(".*[|*:?\"<>].*")) {
+                if (arg.substring(0, 2).matches(".*[|*?\"<>].*")
+                        || arg.substring(2).matches(".*[|*:?\"<>].*")
+                        || arg.matches(".*//.*")) {
                     OutputController.printMessage(OutputMessage.INCORRECT_OUTPUT_PATH);
                 } else {
                     outputPath = arg.replace('\\', '/');
@@ -99,14 +101,14 @@ public class InputController {
                 continue;
             }
 
-            if (arg.matches(".*[|*:?\"<>].*")) {
+            if (arg.substring(0, 2).matches(".*[|*?\"<>].*") || arg.substring(2).matches(".*[|*:?\"<>].*")) {
                 OutputController.printMessage(OutputMessage.INCORRECT_TXT_FILE);
                 continue;
             }
             if (!arg.endsWith(".txt")) {
                 arg = arg + ".txt";
             }
-            inputFiles.add(arg);
+            inputFiles.add(arg.replace('\\', '/'));
         }
 
         return new Arguments(

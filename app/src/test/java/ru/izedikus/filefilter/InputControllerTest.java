@@ -45,10 +45,10 @@ class InputControllerTest {
 
     @Test
     void inputFiles_withoutExtension() {
-        String[] args = new String[]{"file1"};
+        String[] args = new String[]{"C:\\file1"};
         Arguments parsedArgs = InputController.parse(args);
 
-        assertEquals(List.of("file1.txt"), parsedArgs.inputFiles());
+        assertEquals(List.of("C:/file1.txt"), parsedArgs.inputFiles());
     }
 
     @Test
@@ -145,19 +145,19 @@ class InputControllerTest {
 
     @Test
     void outputPath_formatCorrectly() {
-        String[] args1 = new String[]{"-o", "path/"};
-        String[] args2 = new String[]{"--output", "path/"};
+        String[] args1 = new String[]{"-o", "C:/path/"};
+        String[] args2 = new String[]{"--output", "C:/path/"};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
-        assertEquals("path/", parsedArgs1.outputPathIfBeenFlagged());
-        assertEquals("path/", parsedArgs2.outputPathIfBeenFlagged());
+        assertEquals("C:/path/", parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals("C:/path/", parsedArgs2.outputPathIfBeenFlagged());
     }
 
     @Test
     void outputPath_formatIncorrectly() {
-        String[] args1 = new String[]{"-o", "pa*th/"};
-        String[] args2 = new String[]{"--output", "pa*th/"};
+        String[] args1 = new String[]{"-o", "C:/pa:th/"};
+        String[] args2 = new String[]{"--output", "C:/path//"};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
@@ -263,10 +263,10 @@ class InputControllerTest {
 
     @Test
     void mixedFlagsAndFiles() {
-        String[] args = new String[]{"file1", "-a", "-o", "path", "file2", "-p", "prefix_", "-s"};
+        String[] args = new String[]{"C:/file1", "-a", "-o", "path", "C:/fi:le2", "-p", "prefix_", "-s"};
         Arguments parsedArgs = InputController.parse(args);
 
-        assertEquals(List.of("file1.txt", "file2.txt"), parsedArgs.inputFiles());
+        assertEquals(List.of("C:/file1.txt"), parsedArgs.inputFiles());
         assertTrue(parsedArgs.addFlag());
         assertEquals("path/", parsedArgs.outputPathIfBeenFlagged());
         assertEquals("prefix_", parsedArgs.prefixIfBeenFlagged());
