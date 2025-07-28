@@ -23,10 +23,10 @@ public class OutputController {
         if (stats.countString() != 0) {
             System.out.println(OutputMessage.SHORT_STATS_STRING.getValue(stats.countString()));
         }
-        System.out.println(OutputMessage.END);
+        System.out.println(OutputMessage.END.getValue());
     }
 
-    public static void printFullStatistics(Statistics stats) {
+    static void printFullStatistics(Statistics stats) {
         System.out.println(OutputMessage.FULL_STATS.getValue());
         if (stats.countInt() != 0) {
             System.out.println(OutputMessage.FULL_STATS_INT.getValue(

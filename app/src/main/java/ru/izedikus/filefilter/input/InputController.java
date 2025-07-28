@@ -18,16 +18,9 @@ public class InputController {
         Boolean isOutput = null;
         Boolean isPrefix = null;
 
-        for (String arg : args) {
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
             if (arg.charAt(0) == '-') {
-                if (isOutput != null && isOutput) {
-                    OutputController.printMessage(OutputMessage.NO_OUTPUT_PATH);
-                    isOutput = false;
-                }
-                if (isPrefix != null && isPrefix) {
-                    OutputController.printMessage(OutputMessage.NO_PREFIX);
-                    isPrefix = false;
-                }
                 switch (arg) {
                     case "-a", "--add":
                         if (addFlag == null) {
@@ -59,21 +52,25 @@ public class InputController {
                         }
                         break;
                     case "-o", "--output":
-                        if (isOutput == null) {
-                            isOutput = true;
-                        } else {
+                        if (isOutput != null) {
                             OutputController.printMessage(OutputMessage.MANY_OUTPUTS);
+                        } else if (i == args.length -1 || args[i+1].charAt(0) == '-') {
+                            OutputController.printMessage(OutputMessage.MISSING_OUTPUT_PATH);
+                        } else {
+                            isOutput = true;
                         }
                         break;
                     case "-p", "--prefix":
-                        if (isPrefix == null) {
-                            isPrefix = true;
-                        } else {
+                        if (isPrefix != null) {
                             OutputController.printMessage(OutputMessage.MANY_PREFIXES);
+                        } else if (i == args.length - 1 || args[i+1].charAt(0) == '-') {
+                            OutputController.printMessage(OutputMessage.MISSING_PREFIX);
+                        } else {
+                            isPrefix = true;
                         }
                         break;
                     default:
-                        OutputController.printMessage(OutputMessage.INCORRECT_FLAG);
+                        OutputController.printMessage(OutputMessage.INCORRECT_FLAG, arg);
                         break;
                 }
                 continue;
