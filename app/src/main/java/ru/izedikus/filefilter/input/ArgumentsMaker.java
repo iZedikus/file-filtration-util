@@ -1,5 +1,6 @@
 package ru.izedikus.filefilter.input;
 
+import ru.izedikus.filefilter.exceptions.HelpRequestException;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.output.OutputController;
 import ru.izedikus.filefilter.output.OutputMessage;
@@ -38,6 +39,7 @@ class ArgumentsMaker {
             case "-s", "--short" -> handleShortFlag();
             case "-o", "--output" -> handleOutputFlag();
             case "-p", "--prefix" -> handlePrefixFlag();
+            case "-h", "--help" -> throw new HelpRequestException();
             default -> OutputController.printMessage(INCORRECT_FLAG, flag);
         }
     }

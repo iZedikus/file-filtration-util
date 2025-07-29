@@ -1,5 +1,6 @@
 package ru.izedikus.filefilter.input;
 
+import ru.izedikus.filefilter.exceptions.HelpRequestException;
 import ru.izedikus.filefilter.models.Arguments;
 
 /**
@@ -13,7 +14,7 @@ public class InputController {
      * @param args raw command-line arguments
      * @return {@link Arguments} filled according to input arguments
      */
-    public static Arguments parse(String[] args) {
+    public static Arguments parse(String[] args) throws HelpRequestException {
         ArgumentsMaker argsMaker = new ArgumentsMaker();
 
         for (String arg : args) {

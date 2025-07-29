@@ -1,5 +1,6 @@
 package ru.izedikus.filefilter;
 
+import ru.izedikus.filefilter.exceptions.HelpRequestException;
 import ru.izedikus.filefilter.exceptions.IncorrectOutputPathException;
 import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.input.InputController;
@@ -25,6 +26,7 @@ import static ru.izedikus.filefilter.output.OutputMessage.*;
  *     <li><code>-a</code> / <code>--add</code> – whether to add data to existing output files;</li>
  *     <li><code>-f</code> / <code>--full</code> – whether to print full statistics;</li>
  *     <li><code>-s</code> / <code>--short</code> – whether to print short statistics;</li>
+ *     <li><code>-h</code> / <code>--help</code> - whether to abort program and print help message;</li>
  *     <li><code>-o &lt;path&gt;</code> / <code>--output &lt;path&gt;</code> – path to output directory;</li>
  *     <li><code>-p &lt;prefix&gt;</code> / <code>--prefix &lt;prefix&gt;</code> – file prefix for output files.</li>
  * </ul>
@@ -46,6 +48,8 @@ public class CLI {
             OutputController.printMessage(ZERO_INPUT_FILES_EXCEPTION);
         } catch (IncorrectOutputPathException e) {
             OutputController.printMessage(INCORRECT_OUTPUT_PATH_EXCEPTION, e.getMessage());
+        } catch (HelpRequestException e) {
+            OutputController.printMessage(HELP_MESSAGE);
         }
     }
 }
