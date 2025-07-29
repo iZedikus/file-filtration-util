@@ -5,7 +5,6 @@ import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
 import ru.izedikus.filefilter.output.OutputController;
-import ru.izedikus.filefilter.output.OutputMessage;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -16,6 +15,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+
+import static ru.izedikus.filefilter.output.OutputMessage.*;
 
 public class FileController {
     public static Statistics generateStatisticsAndOutputFiles(Arguments args) {
@@ -57,7 +58,7 @@ public class FileController {
             try (Scanner scanner = new Scanner(new File(path)).useLocale(Locale.US)) {
                 handleScanner(scanner, intsWriter, floatsWriter, stringsWriter, processor);
             } catch (FileNotFoundException e) {
-                OutputController.printMessage(OutputMessage.INPUT_FILE_NOT_FOUND, path);
+                OutputController.printMessage(INPUT_FILE_NOT_FOUND, path);
             }
         }
     }

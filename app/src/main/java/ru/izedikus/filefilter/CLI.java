@@ -6,8 +6,9 @@ import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
 import ru.izedikus.filefilter.output.OutputController;
-import ru.izedikus.filefilter.output.OutputMessage;
 import ru.izedikus.filefilter.processing.FileController;
+
+import static ru.izedikus.filefilter.output.OutputMessage.*;
 
 public class CLI {
     public static void main(String[] args) {
@@ -16,9 +17,9 @@ public class CLI {
             Statistics stats = FileController.generateStatisticsAndOutputFiles(parsedArgs);
             OutputController.printStatistics(stats, parsedArgs.fullStatsFlag());
         } catch (ZeroInputFilesException e) {
-            OutputController.printMessage(OutputMessage.ZERO_INPUT_FILES_EXCEPTION);
+            OutputController.printMessage(ZERO_INPUT_FILES_EXCEPTION);
         } catch (IncorrectOutputPathException e) {
-            OutputController.printMessage(OutputMessage.INCORRECT_OUTPUT_PATH_EXCEPTION, e.getMessage());
+            OutputController.printMessage(INCORRECT_OUTPUT_PATH_EXCEPTION, e.getMessage());
         }
     }
 }
