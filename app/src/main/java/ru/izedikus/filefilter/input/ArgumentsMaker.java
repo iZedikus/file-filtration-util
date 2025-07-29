@@ -12,6 +12,10 @@ import java.util.List;
 
 import static ru.izedikus.filefilter.output.OutputMessage.*;
 
+/**
+ * Interprets raw CLI input and producing an {@link Arguments}.
+ * Maintains internal state to handle flags and their values correctly.
+ */
 class ArgumentsMaker {
     List<String> inputFiles = new ArrayList<>();
     String outputPath = "";
@@ -21,6 +25,11 @@ class ArgumentsMaker {
 
     States state = States.DEFAULT;
 
+    /**
+     * Adds a CLI flag to the final arguments configuration or switches value-handling state accordingly.
+     *
+     * @param flag CLI flag (e.g., {@code -f}, {@code -o}, etc.)
+     */
     public void handleFlag(String flag) {
         warnIfInWaitingState();
         switch (flag) {
@@ -58,6 +67,12 @@ class ArgumentsMaker {
         state = States.WAITING_PREFIX;
     }
 
+    /**
+     * Adds a value to the final arguments configuration depending on current value-handling state
+     * (e.g., file path, output path, or prefix).
+     *
+     * @param value non-flag CLI argument
+     */
     public void handleValue(String value) {
         value = value.replace('\\', '/');
 
@@ -125,6 +140,12 @@ class ArgumentsMaker {
         state = States.DEFAULT;
     }
 
+    /**
+     * Finalizes and constructs the {@link Arguments} based on parsed data.
+     * Will interpret null flags as {@code false}, and default strings as empty.
+     *
+     * @return fully built {@link Arguments}
+     */
     public Arguments generateArguments() {
         warnIfInWaitingState();
         return new Arguments(
