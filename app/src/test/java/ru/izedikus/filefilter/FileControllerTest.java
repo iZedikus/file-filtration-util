@@ -1,8 +1,8 @@
 package ru.izedikus.filefilter;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import ru.izedikus.filefilter.exceptions.IncorrectOutputPathException;
 import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
@@ -25,6 +25,7 @@ public class FileControllerTest {
     Path tempDir;
 
     @Test
+    @DisplayName("Should create output files and return statistics for one input file")
     void generateStatisticsAndOutputFiles_shouldCreateFilesAndReturnStats() throws IOException {
         Path inputFile = tempDir.resolve("file1.txt");
         Files.write(inputFile, List.of("123", "1.528535047E-25", "Персик"));
@@ -55,6 +56,7 @@ public class FileControllerTest {
     }
 
     @Test
+    @DisplayName("Should correctly process multiple input files and generate outputs")
     void generateStatisticsAndOutputFiles_withMultipleInputFiles() throws IOException {
         Path inputFile1 = tempDir.resolve("file1.txt");
         Path inputFile2 = tempDir.resolve("file2.txt");
@@ -88,6 +90,7 @@ public class FileControllerTest {
     }
 
     @Test
+    @DisplayName("Should create only necessary files if not all token types are found")
     void generateStatisticsAndOutputFiles_shouldCreateFilesIfNeeded() throws IOException {
         Path inputFile = tempDir.resolve("file1.txt");
         Files.write(inputFile, List.of("123"));
@@ -116,6 +119,7 @@ public class FileControllerTest {
     }
 
     @Test
+    @DisplayName("Should throw ZeroInputFilesException if no input provided")
     void generateStatisticsAndOutputFiles_shouldThrowZeroInputFilesException() {
         String[] systemArgs = new String[]{};
 
@@ -124,8 +128,8 @@ public class FileControllerTest {
         assertThrows(ZeroInputFilesException.class, () -> FileController.generateStatisticsAndOutputFiles(args));
     }
 
-
     @Test
+    @DisplayName("Should print warning for incorrect output path and continue processing")
     void generateStatisticsAndOutputFiles_shouldSkipIncorrectOutputPath() throws IOException {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
@@ -139,7 +143,7 @@ public class FileControllerTest {
                 "C:/Windows"
         ).split(" ");
 
-        Arguments args = InputController.parse(systemArgs);
+        InputController.parse(systemArgs);
 
         assertTrue(outContent.toString().contains(OutputMessage.INCORRECT_OUTPUT_PATH.getValue("C:/Windows/")));
     }
