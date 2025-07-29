@@ -71,7 +71,7 @@ class ArgumentsMaker {
     private void handleFilePath(String path) {
         path = path.endsWith(".txt") ? path : path + ".txt";
 
-        if (!isInputFilePathValid(path)) OutputController.printMessage(INCORRECT_TXT_FILE);
+        if (!isInputFilePathValid(path)) OutputController.printMessage(INPUT_FILE_NOT_FOUND, path);
         else inputFiles.add(path);
 
         state = States.DEFAULT;
@@ -89,7 +89,7 @@ class ArgumentsMaker {
         path = path.endsWith("/") ? path : path + "/";
 
         if (!outputPath.isEmpty()) OutputController.printMessage(MANY_OUTPUTS);
-        else if (!isOutputPathValid(path)) OutputController.printMessage(INCORRECT_OUTPUT_PATH);
+        else if (!isOutputPathValid(path)) OutputController.printMessage(INCORRECT_OUTPUT_PATH, path);
         else outputPath = path;
 
         state = States.DEFAULT;

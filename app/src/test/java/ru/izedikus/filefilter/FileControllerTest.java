@@ -7,9 +7,12 @@ import ru.izedikus.filefilter.exceptions.ZeroInputFilesException;
 import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.models.Statistics;
+import ru.izedikus.filefilter.output.OutputMessage;
 import ru.izedikus.filefilter.processing.FileController;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -123,7 +126,10 @@ public class FileControllerTest {
 
 
     @Test
-    void generateStatisticsAndOutputFiles_shouldThrowIncorrectOutputPathException() throws IOException {
+    void generateStatisticsAndOutputFiles_shouldSkipIncorrectOutputPath() throws IOException {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
         Path inputFile = tempDir.resolve("file1.txt");
         Files.write(inputFile, List.of("123", "1.528535047E-25", "Персик"));
 
@@ -135,6 +141,6 @@ public class FileControllerTest {
 
         Arguments args = InputController.parse(systemArgs);
 
-        assertThrows(IncorrectOutputPathException.class, () -> FileController.generateStatisticsAndOutputFiles(args));
+        assertTrue(outContent.toString().contains(OutputMessage.INCORRECT_OUTPUT_PATH.getValue("C:/Windows/")));
     }
 }
