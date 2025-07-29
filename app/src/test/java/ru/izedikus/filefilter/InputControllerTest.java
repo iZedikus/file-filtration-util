@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.io.TempDir;
+import ru.izedikus.filefilter.exceptions.HelpRequestException;
 import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
 
@@ -95,6 +96,13 @@ class InputControllerTest {
         InputController.parse(args);
 
         assertTrue(outContent.toString().contains(INCORRECT_FLAG.getValue("-x")));
+    }
+
+    @Test
+    void helpFlag_shouldThrownHelpRequestException() {
+        String[] args1 = new String[]{"-h", "--help"};
+
+        assertThrows(HelpRequestException.class, () -> InputController.parse(args1));
     }
 
     @Test
