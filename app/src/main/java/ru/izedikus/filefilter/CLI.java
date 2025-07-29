@@ -9,6 +9,9 @@ import ru.izedikus.filefilter.models.Statistics;
 import ru.izedikus.filefilter.output.OutputController;
 import ru.izedikus.filefilter.processing.FileController;
 
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+
 import static ru.izedikus.filefilter.output.OutputMessage.*;
 
 /**
@@ -40,14 +43,23 @@ public class CLI {
      * @param args command-line arguments provided by the user.
      */
     public static void main(String[] args) {
+
+        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+
         try {
+
             Arguments parsedArgs = InputController.parse(args);
+
             Statistics stats = FileController.generateStatisticsAndOutputFiles(parsedArgs);
+
             OutputController.printStatistics(stats, parsedArgs.fullStatsFlag());
+
         } catch (ZeroInputFilesException e) {
             OutputController.printMessage(ZERO_INPUT_FILES_EXCEPTION);
+
         } catch (IncorrectOutputPathException e) {
             OutputController.printMessage(INCORRECT_OUTPUT_PATH_EXCEPTION, e.getMessage());
+
         } catch (HelpRequestException e) {
             OutputController.printMessage(HELP_MESSAGE);
         }
