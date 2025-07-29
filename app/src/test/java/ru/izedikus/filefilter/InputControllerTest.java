@@ -1,23 +1,48 @@
 package ru.izedikus.filefilter;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.io.TempDir;
 import ru.izedikus.filefilter.input.InputController;
 import ru.izedikus.filefilter.models.Arguments;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.izedikus.filefilter.output.OutputMessage.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-
-import ru.izedikus.filefilter.output.OutputMessage;
 
 class InputControllerTest {
     ByteArrayOutputStream outContent;
+
+    @TempDir
+    Path tempDir;
+
+    private String getTempDir() {
+        return tempDir.toString().replace('\\', '/') + "/";
+    }
+
+    private int fileCount = 0;
+
+    private String getInputFilePath() {
+        String tempDirPath = getTempDir();
+        Path filePath = fileCount == 0
+                ? Path.of(tempDirPath.concat("\\file.txt"))
+                : Path.of(tempDirPath.concat("\\file").concat(String.valueOf(fileCount).concat(".txt")));
+        try {
+            Files.createFile(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fileCount++;
+        return filePath.toAbsolutePath().toString().replace('\\', '/');
+    }
 
     @BeforeEach
     void setup() {
@@ -42,13 +67,34 @@ class InputControllerTest {
         assertFalse(parsedArgs.fullStatsFlag());
     }
 
+    @Test
+    void inputFiles_correctParse() {
+        String filePath = getInputFilePath();
+
+        String[] args = new String[]{filePath};
+        Arguments parsedArgs = InputController.parse(args);
+
+        assertEquals(List.of(filePath), parsedArgs.inputFiles());
+    }
 
     @Test
     void inputFiles_withoutExtension() {
-        String[] args = new String[]{"C:\\file1"};
+        String filePath = getInputFilePath();
+
+        String fileWithoutExtension = filePath.substring(0, filePath.length() - 4);
+
+        String[] args = new String[]{fileWithoutExtension};
         Arguments parsedArgs = InputController.parse(args);
 
-        assertEquals(List.of("C:/file1.txt"), parsedArgs.inputFiles());
+        assertEquals(List.of(filePath), parsedArgs.inputFiles());
+    }
+
+    @Test
+    void incorrectFlag_skip() {
+        String[] args = new String[]{"-x"};
+        InputController.parse(args);
+
+        assertTrue(outContent.toString().contains(INCORRECT_FLAG.getValue("-x")));
     }
 
     @Test
@@ -72,7 +118,7 @@ class InputControllerTest {
         assertTrue(parsedArgs1.addFlag());
         assertTrue(parsedArgs2.addFlag());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MANY_ADDS.getValue()));
+        assertTrue(outContent.toString().contains(MANY_ADDS.getValue()));
     }
 
     @Test
@@ -96,7 +142,7 @@ class InputControllerTest {
         assertTrue(parsedArgs1.fullStatsFlag());
         assertTrue(parsedArgs2.fullStatsFlag());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MANY_FULLS.getValue()));
+        assertTrue(outContent.toString().contains(MANY_FULLS.getValue()));
     }
 
     @Test
@@ -120,7 +166,7 @@ class InputControllerTest {
         assertFalse(parsedArgs1.fullStatsFlag());
         assertFalse(parsedArgs2.fullStatsFlag());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MANY_SHORTS.getValue()));
+        assertTrue(outContent.toString().contains(MANY_SHORTS.getValue()));
     }
 
     @Test
@@ -130,7 +176,7 @@ class InputControllerTest {
 
         assertTrue(parsedArgs.fullStatsFlag());
 
-        assertTrue(outContent.toString().contains(OutputMessage.SHORT_AND_FULL.getValue()));
+        assertTrue(outContent.toString().contains(SHORT_AND_FULL.getValue()));
     }
 
     @Test
@@ -140,77 +186,86 @@ class InputControllerTest {
 
         assertFalse(parsedArgs.fullStatsFlag());
 
-        assertTrue(outContent.toString().contains(OutputMessage.SHORT_AND_FULL.getValue()));
+        assertTrue(outContent.toString().contains(SHORT_AND_FULL.getValue()));
     }
 
     @Test
     void outputPath_formatCorrectly() {
-        String[] args1 = new String[]{"-o", "C:/path/"};
-        String[] args2 = new String[]{"--output", "C:/path/"};
+        String outputPath = getTempDir();
+
+        String[] args1 = new String[]{"-o", outputPath};
+        String[] args2 = new String[]{"--output", outputPath};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
-        assertEquals("C:/path/", parsedArgs1.outputPathIfBeenFlagged());
-        assertEquals("C:/path/", parsedArgs2.outputPathIfBeenFlagged());
+        assertEquals(outputPath, parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals(outputPath, parsedArgs2.outputPathIfBeenFlagged());
     }
 
     @Test
     void outputPath_formatIncorrectly() {
-        String[] args1 = new String[]{"-o", "C:/pa:th/"};
-        String[] args2 = new String[]{"--output", "C:/path//"};
+        String outputPath = getTempDir();
+        String incorrectOutputPath = new StringBuilder(outputPath).insert(outputPath.length() / 2, ":").toString();
+
+        String[] args1 = new String[]{"-o", incorrectOutputPath};
+        String[] args2 = new String[]{"--output", incorrectOutputPath};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
         assertEquals("", parsedArgs1.outputPathIfBeenFlagged());
         assertEquals("", parsedArgs2.outputPathIfBeenFlagged());
 
-        assertTrue(outContent.toString().contains(OutputMessage.INCORRECT_OUTPUT_PATH.getValue()));
+        assertTrue(outContent.toString().contains(INCORRECT_OUTPUT_PATH.getValue(incorrectOutputPath)));
     }
 
     @Test
     void outputPath_withoutEndingSlash() {
-        String[] args1 = new String[]{"-o", "path"};
-        String[] args2 = new String[]{"--output", "path"};
+        String outputPath = getTempDir();
+
+        String[] args1 = new String[]{"-o", outputPath.substring(0, outputPath.length() - 1)};
+        String[] args2 = new String[]{"--output", outputPath};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
-        assertEquals("path/", parsedArgs1.outputPathIfBeenFlagged());
-        assertEquals("path/", parsedArgs2.outputPathIfBeenFlagged());
+        assertEquals(outputPath, parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals(outputPath, parsedArgs2.outputPathIfBeenFlagged());
     }
 
     @Test
     void outputPath_missingArgument_skip() {
-        String[] args1 = new String[]{"file1", "-o", "-h"};
-        String[] args2 = new String[]{"file1", "--output"};
+        String filePath = getInputFilePath();
+
+        String[] args1 = new String[]{filePath, "-o"};
+        String[] args2 = new String[]{filePath, "--output"};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
-        assertEquals(List.of("file1.txt"), parsedArgs1.inputFiles());
-        assertEquals(List.of("file1.txt"), parsedArgs2.inputFiles());
+        assertEquals(List.of(filePath), parsedArgs1.inputFiles());
+        assertEquals(List.of(filePath), parsedArgs2.inputFiles());
         assertEquals("", parsedArgs1.outputPathIfBeenFlagged());
         assertEquals("", parsedArgs2.outputPathIfBeenFlagged());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MISSING_OUTPUT_PATH.getValue()));
+        assertTrue(outContent.toString().contains(MISSING_OUTPUT_PATH.getValue()));
     }
 
     @Test
     void outputFlag_manyPaths() {
-        String[] args1 = new String[]{"-o", "path1", "-o", "-path2"};
-        String[] args2 = new String[]{"--output", "path1", "--output", "path2"};
+        String outputPath1 = getTempDir();
+        String outputPath2 = outputPath1 + "into/";
+
+        String[] args1 = new String[]{"-o", outputPath1, "-o", outputPath2};
+        String[] args2 = new String[]{"--output", outputPath1, "--output", outputPath2};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
-        assertEquals("path1/", parsedArgs1.outputPathIfBeenFlagged());
-        assertEquals("path1/", parsedArgs2.outputPathIfBeenFlagged());
+        assertEquals(outputPath1, parsedArgs1.outputPathIfBeenFlagged());
+        assertEquals(outputPath1, parsedArgs2.outputPathIfBeenFlagged());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MANY_OUTPUTS.getValue()));
+        assertTrue(outContent.toString().contains(MANY_OUTPUTS.getValue()));
     }
 
     @Test
     void prefix_formatCorrectly() {
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-
         String[] args1 = new String[]{"-p", "prefix_"};
         String[] args2 = new String[]{"--prefix", "prefix_"};
         Arguments parsedArgs1 = InputController.parse(args1);
@@ -230,22 +285,24 @@ class InputControllerTest {
         assertEquals("", parsedArgs1.prefixIfBeenFlagged());
         assertEquals("", parsedArgs2.prefixIfBeenFlagged());
 
-        assertTrue(outContent.toString().contains(OutputMessage.INCORRECT_PREFIX.getValue()));
+        assertTrue(outContent.toString().contains(INCORRECT_PREFIX.getValue()));
     }
 
     @Test
     void prefixFlag_missingArgument() {
-        String[] args1 = new String[]{"file1", "-p"};
-        String[] args2 = new String[]{"file1", "--prefix"};
+        String filePath = getInputFilePath();
+
+        String[] args1 = new String[]{filePath, "-p"};
+        String[] args2 = new String[]{filePath, "--prefix"};
         Arguments parsedArgs1 = InputController.parse(args1);
         Arguments parsedArgs2 = InputController.parse(args2);
 
-        assertEquals(List.of("file1.txt"), parsedArgs1.inputFiles());
-        assertEquals(List.of("file1.txt"), parsedArgs2.inputFiles());
+        assertEquals(List.of(filePath), parsedArgs1.inputFiles());
+        assertEquals(List.of(filePath), parsedArgs2.inputFiles());
         assertEquals("", parsedArgs1.prefixIfBeenFlagged());
         assertEquals("", parsedArgs2.prefixIfBeenFlagged());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MISSING_PREFIX.getValue()));
+        assertTrue(outContent.toString().contains(MISSING_PREFIX.getValue()));
     }
 
     @Test
@@ -258,37 +315,26 @@ class InputControllerTest {
         assertEquals("prefix1_", parsedArgs1.prefixIfBeenFlagged());
         assertEquals("prefix1_", parsedArgs2.prefixIfBeenFlagged());
 
-        assertTrue(outContent.toString().contains(OutputMessage.MANY_PREFIXES.getValue()));
+        assertTrue(outContent.toString().contains(MANY_PREFIXES.getValue()));
     }
 
     @Test
-    void mixedFlagsAndFiles() {
-        String[] args = new String[]{"C:/file1", "-a", "-o", "path", "C:/fi:le2", "-p", "prefix_", "-s"};
+    void mixedFlagsWithCorrectAndIncorrectFiles() {
+        String outputPath = getTempDir();
+
+        String filePath1 = getInputFilePath();
+
+        String filePath2 = getInputFilePath();
+        filePath2 = filePath2.substring(0, filePath2.length() / 2) + ":" + filePath2.substring(filePath2.length() / 2);
+
+        String[] args = new String[]{filePath1, "-a", "-o", outputPath, filePath2, "-p", "prefix_"};
         Arguments parsedArgs = InputController.parse(args);
 
-        assertEquals(List.of("C:/file1.txt"), parsedArgs.inputFiles());
+        assertEquals(List.of(filePath1), parsedArgs.inputFiles());
         assertTrue(parsedArgs.addFlag());
-        assertEquals("path/", parsedArgs.outputPathIfBeenFlagged());
+        assertEquals(outputPath, parsedArgs.outputPathIfBeenFlagged());
         assertEquals("prefix_", parsedArgs.prefixIfBeenFlagged());
-    }
 
-    @Test
-    void incorrectFlag_skip() {
-        String[] args = new String[]{"-x", "file1"};
-        Arguments parsedArgs = InputController.parse(args);
-
-        assertEquals(List.of("file1.txt"), parsedArgs.inputFiles());
-
-        assertTrue(outContent.toString().contains(OutputMessage.INCORRECT_FLAG.getValue("-x")));
-    }
-
-    @Test
-    void inputFiles_incorrectFileNameException() {
-        String[] args = new String[]{"fi*le1"};
-        Arguments parsedArgs = InputController.parse(args);
-
-        assertTrue(parsedArgs.inputFiles().isEmpty());
-
-        assertTrue(outContent.toString().contains(OutputMessage.INCORRECT_TXT_FILE.getValue()));
+        assertTrue(outContent.toString().contains(INPUT_FILE_NOT_FOUND.getValue(filePath2)));
     }
 }
