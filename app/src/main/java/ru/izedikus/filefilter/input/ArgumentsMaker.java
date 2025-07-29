@@ -136,8 +136,12 @@ class ArgumentsMaker {
         if (state == States.DEFAULT) return;
 
         switch (state) {
-            case WAITING_OUTPUT_PATH -> OutputController.printMessage(OutputMessage.MISSING_OUTPUT_PATH);
-            case WAITING_PREFIX -> OutputController.printMessage(OutputMessage.MISSING_PREFIX);
+            case WAITING_OUTPUT_PATH:
+                if (outputPath.isEmpty()) OutputController.printMessage(OutputMessage.MISSING_OUTPUT_PATH);
+                break;
+            case WAITING_PREFIX:
+                if (prefix.isEmpty()) OutputController.printMessage(OutputMessage.MISSING_PREFIX);
+                break;
         }
         state = States.DEFAULT;
     }
