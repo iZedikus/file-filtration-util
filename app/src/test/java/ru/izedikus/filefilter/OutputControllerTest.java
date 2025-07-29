@@ -66,8 +66,8 @@ public class OutputControllerTest {
         assertTrue(output.contains("Максимальное обнаруженное вещественное число: 1"));
         assertTrue(output.contains("Среднее значение обнаруженных вещественных чисел: 1"));
         assertTrue(output.contains("Строк обнаружено: 1"));
-        assertTrue(output.contains("Строка минимальной длины: 1"));
-        assertTrue(output.contains("Строка максимальной длины: 1"));
+        assertTrue(output.contains("Минимальная длина строки: 1"));
+        assertTrue(output.contains("Максимальная длина строки: 1"));
         assertTrue(output.contains("Программа завершает работу"));
 
         System.setOut(System.out);
