@@ -37,7 +37,7 @@ public class FileController {
      */
     public static Statistics generateStatisticsAndOutputFiles(Arguments args) {
         String outputPath = args.outputPathIfBeenFlagged().isBlank()
-                ? Paths.get("").toAbsolutePath().toString()
+                ? Paths.get("").toAbsolutePath().toString().concat("/")
                 : args.outputPathIfBeenFlagged();
         String prefix = args.prefixIfBeenFlagged();
         boolean append = args.addFlag();
