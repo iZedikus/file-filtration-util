@@ -18,7 +18,23 @@ import java.util.Scanner;
 
 import static ru.izedikus.filefilter.output.OutputMessage.*;
 
+/**
+ * Handles reading input files, parsing their contents, writing categorized
+ * tokens to respective output files, and generating statistics.
+ */
 public class FileController {
+    /**
+     * Manages the entire workflow: reads input files, classifies tokens,
+     * writes them to files by type, and returns statistical summary.
+     * <p>
+     * Uses {@link TokenFullStatsProcessor} or {@link TokenShortStatsProcessor}
+     * depending on {@code fullStatsFlag}.
+     *
+     * @param args arguments containing input file paths, flags, and output settings
+     * @return aggregated statistics based on parsed content
+     * @throws UncheckedIOException           if writing fails
+     * @throws IncorrectOutputPathException  if writing to specified output path fails
+     */
     public static Statistics generateStatisticsAndOutputFiles(Arguments args) {
         String outputPath = args.outputPathIfBeenFlagged().isBlank()
                 ? Paths.get("").toAbsolutePath().toString()
@@ -43,6 +59,16 @@ public class FileController {
         }
     }
 
+    /**
+     * Iterates through all input files, delegating scanning and token classification.
+     *
+     * @param args          parsed arguments
+     * @param intsWriter    file writer for integer tokens
+     * @param floatsWriter  file writer for float tokens
+     * @param stringsWriter file writer for string tokens
+     * @param processor     handler for updating statistics per token
+     * @throws ZeroInputFilesException if no input files are provided
+     */
     static void handleData(
             Arguments args,
             LazyFileWriter intsWriter,
@@ -63,6 +89,17 @@ public class FileController {
         }
     }
 
+    /**
+     * Reads and classifies individual tokens using a {@link Scanner},
+     * writing each to its corresponding output file and updating statistics.
+     *
+     * @param scanner       scanner reading from a single input file
+     * @param intsWriter    file writer for integer tokens
+     * @param floatsWriter  file writer for float tokens
+     * @param stringsWriter file writer for string tokens
+     * @param processor     statistics handler for each token type
+     * @throws IncorrectOutputPathException if writing to a file fails
+     */
     static void handleScanner(
             Scanner scanner,
             LazyFileWriter intsWriter,
@@ -93,6 +130,10 @@ public class FileController {
         }
     }
 
+    /**
+     * Lazy-initialization wrapper over {@link BufferedWriter}, allowing
+     * file creation and stream allocation only on first write.
+     */
     static class LazyFileWriter extends Writer {
         BufferedWriter realWriter;
         final Path filePath;

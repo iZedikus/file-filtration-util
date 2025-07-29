@@ -5,6 +5,10 @@ import ru.izedikus.filefilter.models.Statistics;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * Lightweight implementation of {@link TokenHandler}, collects only counts of
+ * each token type without any statistical calculations.
+ */
 public class TokenShortStatsProcessor implements TokenHandler {
     Long countInt = 0L;
     Long countFloat = 0L;

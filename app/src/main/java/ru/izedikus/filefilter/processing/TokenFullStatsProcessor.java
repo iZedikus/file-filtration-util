@@ -6,6 +6,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
+/**
+ * Full implementation of {@link TokenHandler}, collects count, sum, min, max,
+ * and average for numeric types, and string length range for string data.
+ */
 public class TokenFullStatsProcessor implements TokenHandler {
     Long countInt = 0L;
     Long countFloat = 0L;
