@@ -5,6 +5,7 @@ import ru.izedikus.filefilter.models.Arguments;
 import ru.izedikus.filefilter.output.OutputController;
 import ru.izedikus.filefilter.output.OutputMessage;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -76,7 +77,7 @@ class ArgumentsMaker {
      * @param value non-flag CLI argument
      */
     public void handleValue(String value) {
-        value = value.replace('\\', '/');
+        value = value.replace('\\', '/').replace('\"', '/');
 
         switch (state) {
             case DEFAULT -> handleFilePath(value);
@@ -103,19 +104,18 @@ class ArgumentsMaker {
     }
 
     private void handleOutputPath(String path) {
-        path = path.endsWith("/") ? path : path + "/";
-
         if (!outputPath.isEmpty()) OutputController.printMessage(MANY_OUTPUTS);
         else if (!isOutputPathValid(path)) OutputController.printMessage(INCORRECT_OUTPUT_PATH, path);
-        else outputPath = path;
+        else outputPath = path.endsWith("/") ? path : path + "/";
 
         state = States.DEFAULT;
     }
 
     private boolean isOutputPathValid(String path) {
         try {
-            return Files.isWritable(Path.of(path));
-        } catch (InvalidPathException e) {
+            Files.createDirectories(Path.of(path));
+            return true;
+        } catch (InvalidPathException | IOException e) {
             return false;
         }
     }
